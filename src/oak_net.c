@@ -312,8 +312,8 @@ static dma_addr_t oak_net_alloc_rx_skb(ldg_t *ldg, oak_t *np,
 		/* Setup any required IOMMU (in x86)/SMMU (in ARM) mapping
 		 * and get the dma handling pointer
 		 */
-		dma_handle = pci_map_single(np->pdev, skb->data, rx_buf_sz,
-					    PCI_DMA_FROMDEVICE);
+		dma_handle = dma_map_single(&(np->pdev->dev), skb->data, rx_buf_sz,
+					    DMA_FROM_DEVICE);
 
 		/* Check for any DMA mapping error */
 		if (unlikely(dma_mapping_error(np->device, dma_handle))) {
@@ -580,7 +580,7 @@ void oak_net_add_napi(struct net_device *netdev)
 
 	while (num_ldg > 0) {
 		/* Initialize a napi context */
-		netif_napi_add(netdev, &ldg->napi, oak_net_poll, napi_wt);
+		netif_napi_add(netdev, &ldg->napi, oak_net_poll);
 		/* Enable NAPI scheduling */
 		napi_enable(&ldg->napi);
 		++ldg;
@@ -633,7 +633,7 @@ int oak_net_set_mac_addr(struct net_device *dev, void *p_addr)
 	if (rc == 0) {
 		rc = -EINVAL;
 	} else {
-		memcpy(dev->dev_addr, addr->sa_data, ETH_ALEN);
+		eth_hw_addr_set(dev, addr->sa_data);
 
 		/* When an interface come up we need to remember the
 		 * MAC address of an interface. Because the same MAC
@@ -648,8 +648,7 @@ int oak_net_set_mac_addr(struct net_device *dev, void *p_addr)
 
 		if (rc) {
 			while (channel < np->num_rx_chan) {
-				oak_unimac_set_rx_da(np, channel,
-						     dev->dev_addr, 1);
+				oak_unimac_set_rx_da(np, channel, dev->dev_addr, 1);
 				++channel;
 			}
 			rc = 0;
@@ -979,8 +978,8 @@ void oak_net_rbr_free(oak_t *np, oak_rx_chan_t *rxp)
 
 			if (dma != 0) {
 				/* Unmap the memory */
-				pci_unmap_single(np->pdev, dma, rx_buf_sz,
-						 PCI_DMA_FROMDEVICE);
+				dma_unmap_single(&(np->pdev->dev), dma, rx_buf_sz,
+						 DMA_FROM_DEVICE);
 				dev_kfree_skb(skb);
 			}
 		}
@@ -1530,21 +1529,21 @@ static int oak_net_process_rx_pkt(ldg_t *ldg, oak_rx_chan_t *rxc, u32 desc_num,
 					}
 				}
 
-				pci_dma_sync_single_for_cpu
-				(np->pdev,
+				dma_sync_single_for_cpu
+				(&(np->pdev->dev),
 				 le64_to_cpu((__force __le64)rba->dma_addr),
 				 blen,
-				 PCI_DMA_FROMDEVICE);
+				 DMA_FROM_DEVICE);
 
 				if (jumbo)
 					rx_buf_sz = OAK_RX_BUFFER_SIZE;
 				else
 					rx_buf_sz = OAK_BUFFER_SIZE_2048;
-				pci_unmap_single
-				(np->pdev,
+				dma_unmap_single
+				(&(np->pdev->dev),
 				 le64_to_cpu((__force __le64)rba->dma_addr),
 				 rx_buf_sz + NET_IP_ALIGN,
-				 PCI_DMA_FROMDEVICE);
+				 DMA_FROM_DEVICE);
 				rba->skb = NULL;
 
 				skb->dev = np->netdev;

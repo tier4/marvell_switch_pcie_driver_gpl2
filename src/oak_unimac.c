@@ -570,7 +570,7 @@ void oak_unimac_set_rx_none(oak_t *np, u32 ring)
  * register, then set the rx ring map bit.
  */
 /* polyspace-begin CODE-METRICS:* [Justified] "Deviation HDRV-1408" */
-void oak_unimac_set_rx_da(oak_t *np, u32 ring, unsigned char *addr,
+void oak_unimac_set_rx_da(oak_t *np, u32 ring, const unsigned char *addr,
 			  u32 enable)
 {
 	u32 val_1;

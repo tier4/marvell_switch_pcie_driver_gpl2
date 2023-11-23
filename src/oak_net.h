@@ -37,7 +37,6 @@ extern int chan;
 extern int rto;
 extern int mhdr;
 extern u32 port_speed;
-extern int napi_wt;
 extern int jumbo;
 
 /* Name      : esu_set_mtu

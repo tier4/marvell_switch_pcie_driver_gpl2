@@ -545,7 +545,7 @@ void oak_unimac_set_rx_none(oak_t *np, u32 ring);
  * Parameters  : oak_t *np, u32 ring, unsigned char *addr, int enable
  * Description : This function set rx ring MAC address
  */
-void oak_unimac_set_rx_da(oak_t *np, u32 ring, unsigned char *addr,
+void oak_unimac_set_rx_da(oak_t *np, u32 ring, const unsigned char *addr,
 			  u32 enable);
 
 /* Name        : oak_unimac_set_rx_da_mask

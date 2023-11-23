@@ -43,9 +43,6 @@ MODULE_PARM_DESC(mhdr, "Marvell header generation");
 module_param(port_speed, int, 0);
 MODULE_PARM_DESC(mhdr, "Unimac 11 Port speed");
 
-module_param(napi_wt, int, 0);
-MODULE_PARM_DESC(napi_wt, "NAPI Poll weight/budget");
-
 module_param(jumbo, int, 0);
 MODULE_PARM_DESC(jumbo, "Enable/Disable jumbo support, enabled by default");
 MODULE_LICENSE("GPL");
