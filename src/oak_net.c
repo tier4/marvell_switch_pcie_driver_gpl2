@@ -580,7 +580,7 @@ void oak_net_add_napi(struct net_device *netdev)
 
 	while (num_ldg > 0) {
 		/* Initialize a napi context */
-		netif_napi_add(netdev, &ldg->napi, oak_net_poll);
+		netif_napi_add(netdev, &ldg->napi, oak_net_poll, 64);
 		/* Enable NAPI scheduling */
 		napi_enable(&ldg->napi);
 		++ldg;
